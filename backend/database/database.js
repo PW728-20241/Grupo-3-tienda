@@ -1,6 +1,8 @@
-import { Sequelize } from "sequelize";
+const { Sequelize } = require("sequelize");
 
-export const sequelize = new Sequelize("grupotres", "grupotres", "Abc$1234", {
-    host: "grupotres.postgres.database.azure.com",
-    dialect: "postgres"
+const sequelize = new Sequelize(process.env.grupotres, process.env.grupotres, process.env.Abc$1234, {
+  host: process.env.grupotres.postgres.database.azure.com,
+  dialect: "postgres",
 });
+
+module.exports = { sequelize };
