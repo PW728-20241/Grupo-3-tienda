@@ -5,6 +5,7 @@ import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import IconButton from '@mui/material/IconButton';
 import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
+
 function Header2() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();

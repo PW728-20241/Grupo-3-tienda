@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Box, TextField, Button } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import Header from '../common/header';
-import Footer from '../common/footer';
+  import Header from '../common/header';
+  import Footer from '../common/footer';
 
 const DetalleUsuario = () => {
   const { userId } = useParams(); // Obtener el ID del usuario desde los parámetros de la URL

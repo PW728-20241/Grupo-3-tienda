@@ -68,7 +68,7 @@ function Principal(){
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    {objetos.filter(objetos => objetos.id>3 && objetos.id<9).map(objetos => (
+                    {objetos.filter(objetos => objetos.id>0 && objetos.id<4).map(objetos => (
                         <SCollection
                         txtL1={objetos.nombre}
                         hiperv="Learn More"
