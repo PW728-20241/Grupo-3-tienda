@@ -24,7 +24,7 @@ const LoginPage = () => {
 
   const fetchUser = async (userId) => {
     try {
-      const response = await fetch(`https://tienditadelabuelo.postgres.database.azure.com/usuario2/${userId}`);
+      const response = await fetch(`http://localhost:3080/usuario2/${userId}`);
       const userData = await response.json();
       console.log('Usuario autenticado:', userData);
     } catch (error) {
@@ -37,7 +37,7 @@ const LoginPage = () => {
     const { correo, password } = formData;
 
     try {
-      const response = await fetch('https://tienditadelabuelo.postgres.database.azure.com/login', {
+      const response = await fetch('http://localhost:3080/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -11,7 +11,7 @@ const ForgotPasswordPage = () => {
 
   const fetchUser = async (userId) => {
     try {
-      const response = await fetch(`https://tienditadelabuelo.postgres.database.azure.com/usuario2/${userId}`);
+      const response = await fetch(`http://localhost:3080/usuario2/${userId}`);
       const userData = await response.json();
       console.log('Usuario encontrado:', userData);
     } catch (error) {
@@ -23,7 +23,7 @@ const ForgotPasswordPage = () => {
     event.preventDefault();
     
     try {
-      const response = await fetch('https://tienditadelabuelo.postgres.database.azure.com/forgot-password', {
+      const response = await fetch('http://localhost:3080/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
