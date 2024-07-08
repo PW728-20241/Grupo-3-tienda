@@ -9,9 +9,41 @@ const ForgotPasswordPage = () => {
   const [emailSent, setEmailSent] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const fetchUser = async (userId) => {
+    try {
+      const response = await fetch(`https://tienditadelabuelo.postgres.database.azure.com/usuario2/${userId}`);
+      const userData = await response.json();
+      console.log('Usuario encontrado:', userData);
+    } catch (error) {
+      console.error('Error al obtener el usuario:', error);
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setEmailSent(true);
+    
+    try {
+      const response = await fetch('https://tienditadelabuelo.postgres.database.azure.com/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ correo: email })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log(errorData.message || 'Error al enviar el correo');
+        return;
+      }
+
+      const userData = await response.json();
+      await fetchUser(userData.id);
+
+      setEmailSent(true);
+    } catch (error) {
+      console.log('Error en el servidor');
+    }
   };
 
   return (
@@ -42,7 +74,6 @@ const ForgotPasswordPage = () => {
             </Typography>
           )}
           <Box sx={{ mt: 2 }}>
-            {/* Modifica la función onClick para redirigir a la página LoginPage */}
             <Link href="#" variant="body2" onClick={() => navigate('/LoginPage')}>
               Regresar a Login
             </Link>
