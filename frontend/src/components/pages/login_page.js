@@ -22,17 +22,27 @@ const LoginPage = () => {
     setMostrarOpciones(true);
   };
 
+  const fetchUser = async (userId) => {
+    try {
+      const response = await fetch(`https://tienditadelabuelo.postgres.database.azure.com/usuario2/${userId}`);
+      const userData = await response.json();
+      console.log('Usuario autenticado:', userData);
+    } catch (error) {
+      console.error('Error al obtener el usuario:', error);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const { correo, password } = formData;
 
     try {
-      const response = await fetch('http://localhost:3080/login', {
+      const response = await fetch('https://tienditadelabuelo.postgres.database.azure.com/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ correo })
+        body: JSON.stringify({ correo, password })
       });
 
       if (!response.ok) {
@@ -43,18 +53,14 @@ const LoginPage = () => {
       }
 
       const data = await response.json();
-      if (password !== data.contrasena) {
-        setMensajeError('Correo o contraseña incorrectos');
-        setMostrarOpciones(false);
-        return;
-      }
+      await fetchUser(data.id);
 
       setFormData({
         correo: '',
         password: ''
       });
       setMensajeError('');
-      navigate(`/pantalla-principal/${data.id}`); // Redirige a la página principal con el ID del usuario
+      navigate(`/pantalla-principal/${data.id}`);
     } catch (error) {
       setMensajeError('Error en el servidor');
       setMostrarOpciones(false);
