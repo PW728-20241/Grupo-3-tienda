@@ -221,6 +221,64 @@ app.get('/usuarios/:userId/ordenes', async (req, res) => {
     res.status(500).json({ message: 'Error en el servidor', error });
   }
 });
+app.post('/register', async (req, res) => {
+  const { nombre, apellido, correo, contrasenia } = req.body;
+
+  try {
+    const nuevoUsuario = await Usuario.create({ nombre, apellido, correo, contrasenia });
+    res.status(201).json(nuevoUsuario);
+  } catch (error) {
+    res.status(400).json({ message: 'Error al crear el usuario', error });
+  }
+});
+
+app.post('/forgot-password', async (req, res) => {
+  const { correo } = req.body;
+
+  try {
+    const usuario = await Usuario.findOne({ where: { correo } });
+
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json({ id: usuario.id, message: 'Correo de recuperación enviado' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al procesar la solicitud', error });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { correo, contrasenia } = req.body;
+
+  try {
+    const usuario = await Usuario.findOne({ where: { correo } });
+
+    if (!usuario || usuario.contrasenia !== contrasenia) {
+      return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
+    }
+
+    res.status(200).json({ id: usuario.id, nombre: usuario.nombre });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al procesar la solicitud', error });
+  }
+});
+
+app.get('/usuario/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const usuario = await Usuario.findByPk(id);
+
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json(usuario);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener los datos del usuario', error });
+  }
+});
 /////////////ORDENES////////////////
 app.get("/admin/ordenes/:id", async function(req, res){
    const idOrden = req.params.id;

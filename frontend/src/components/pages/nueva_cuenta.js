@@ -23,7 +23,17 @@ const NuevaCuenta = () => {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const fetchUser = async (userId) => {
+    try {
+      const response = await fetch(`http://localhost:3080/user/${userId}`);
+      const userData = await response.json();
+      console.log('Usuario registrado:', userData);
+    } catch (error) {
+      console.error('Error al obtener el usuario:', error);
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const { nombre, apellido, correo, password, confirmarPassword } = formData;
 
@@ -31,17 +41,37 @@ const NuevaCuenta = () => {
       setMensajeError('Las contraseñas no coinciden');
       return;
     }
-    console.log('Datos enviados:', { nombre, apellido, correo, password });
 
-    setFormData({
-      nombre: '',
-      apellido: '',
-      correo: '',
-      password: '',
-      confirmarPassword: ''
-    });
-    setMensajeError('');
-    navigate('/LoginPage');
+    try {
+      const response = await fetch('http://localhost:3080/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nombre, apellido, correo, password })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setMensajeError(errorData.message || 'Error al crear la cuenta');
+        return;
+      }
+
+      const userData = await response.json();
+      await fetchUser(userData.id);
+
+      setFormData({
+        nombre: '',
+        apellido: '',
+        correo: '',
+        password: '',
+        confirmarPassword: ''
+      });
+      setMensajeError('');
+      navigate('/LoginPage');
+    } catch (error) {
+      setMensajeError('Error en el servidor');
+    }
   };
 
   return (
