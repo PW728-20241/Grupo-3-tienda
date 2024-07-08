@@ -14,11 +14,13 @@ const CambiarContrasena = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null); // Añadir estado de error
   const [success, setSuccess] = useState(null); // Añadir estado de éxito
+  const URL = 'https://tienditadelabuelo.postgres.database.azure.com';
+  const url2 = 'http://localhost:3080';
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://localhost:3080/usuarios/${userId}`);
+        const response = await fetch(url2+'/usuarios/'+userId);
         if (!response.ok) {
           throw new Error('Error al obtener los datos del usuario');
         }
@@ -54,7 +56,7 @@ const CambiarContrasena = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3080/usuarios/${userId}`, {
+      const response = await fetch(url2+'/usuarios/'+userId, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

@@ -8,9 +8,9 @@ const MenuLateral = ({ userId, setSelectedSection }) => {
   const handleNavigation = (section) => {
     setSelectedSection(section);
     if (section === 'datos-registro') {
-      navigate(`/detalleusuario/${userId}`);
+      navigate('/detalleusuario/'+userId);
     } else if (section === 'cambiar-password') {
-      navigate(`/cambiarcontrasena/${userId}`);
+      navigate('/cambiarcontrasena/'+userId);
     }
   };
 
