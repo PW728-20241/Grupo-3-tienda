@@ -13,6 +13,8 @@ export default function AgregarSerie() {
   const [productos, setProductos] = useState(serie?.productos || []);
   const [open, setOpen] = useState(false);
   const [availableProducts, setAvailableProducts] = useState([]);
+  const URL = 'https://tienditadelabuelo.postgres.database.azure.com';
+  const url2 = 'http://localhost:3080';
 
   useEffect(() => {
     if (serie && serie.id) {
@@ -23,7 +25,7 @@ export default function AgregarSerie() {
 
   const fetchSeriesProducts = async (serieId) => {
     try {
-      const response = await fetch(`http://localhost:3080/admin/series/${serieId}`);
+      const response = await fetch(url2+'/admin/series/'+serieId);
       const data = await response.json();
       setNombre(data.nombre);
       setDescripcion(data.descripcion);
@@ -35,7 +37,7 @@ export default function AgregarSerie() {
 
   const fetchAllProducts = async () => {
     try {
-      const response = await fetch('http://localhost:3080/admin/productos');
+      const response = await fetch(url2+'/admin/productos');
       const data = await response.json();
       setAvailableProducts(data);
     } catch (error) {
@@ -50,7 +52,7 @@ export default function AgregarSerie() {
   const handleRemoveProduct = async (product) => {
     try {
       if (serie && serie.id) {
-        await fetch(`http://localhost:3080/admin/series/${serie.id}/productos/${product.id}`, {
+        await fetch(url2+'/admin/series/'+serie.id+'/productos/'+product.id, {
           method: 'DELETE'
         });
       }
@@ -69,7 +71,7 @@ export default function AgregarSerie() {
 
     try {
       if (serie && serie.id) {
-        await fetch(`http://localhost:3080/admin/series/${serie.id}`, {
+        await fetch(url2+'/admin/series/'+serie.id, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -77,7 +79,7 @@ export default function AgregarSerie() {
           body: JSON.stringify(serieData)
         });
       } else {
-        await fetch('http://localhost:3080/admin/series', {
+        await fetch(url2+'/admin/series', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -94,7 +96,7 @@ export default function AgregarSerie() {
   const handleAddToSerie = async (product) => {
     try {
       if (serie && serie.id) {
-        await fetch(`http://localhost:3080/admin/series/${serie.id}/productos/${product.id}`, {
+        await fetch(url2+'/admin/series/'+serie.id+'/productos/'+product.id, {
           method: 'POST'
         });
       }

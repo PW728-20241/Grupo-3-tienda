@@ -78,11 +78,11 @@ export default function Series() {
   };
 
   const handleViewClick = (serie) => {
-    navigate(`/admin/agregarserie/${serie.id}`, { state: { serie } });
+    navigate('/admin/agregarserie/'+serie.id, { state: { serie } });
   };
 
   const handleAddNewSerie = () => {
-    navigate(`/admin/agregarserie`);
+    navigate('/admin/agregarserie');
   };
 
   return (

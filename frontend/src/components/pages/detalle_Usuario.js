@@ -10,13 +10,15 @@ const DetalleUsuario = () => {
   const [loading, setLoading] = useState(true); // Añadir estado de carga
   const [error, setError] = useState(null); // Añadir estado de error
   const [isEditing, setIsEditing] = useState(false); // Estado para modo edición
+  const URL = 'https://tienditadelabuelo.postgres.database.azure.com';
+  const url2 = 'http://localhost:3080';
 
   useEffect(() => {
     // Obtener los datos del usuario utilizando el ID
     const fetchUser = async () => {
       try {
         console.log('Fetching user data for userId:', userId); // Log de depuración
-        const response = await fetch(`http://localhost:3080/usuarios/${userId}`);
+        const response = await fetch(url2+'/usuarios/'+userId);
         if (!response.ok) {
           throw new Error(`Network response was not ok: ${response.statusText}`);
         }
@@ -40,7 +42,7 @@ const DetalleUsuario = () => {
 
   const handleSaveClick = async () => {
     try {
-      const response = await fetch(`http://localhost:3080/usuarios/${userId}`, {
+      const response = await fetch(url2+'/usuarios/'+userId, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

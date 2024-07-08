@@ -9,11 +9,13 @@ const OrdenesUsuario = () => {
   const navigate = useNavigate();
   const [ordenes, setOrdenes] = useState([]);
   const [error, setError] = useState(null);
+  const URL = 'https://tienditadelabuelo.postgres.database.azure.com';
+  const url2 = 'http://localhost:3080';
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`http://localhost:3080/usuarios/${userId}/ordenes`);
+        const response = await fetch(url2+'/usuarios/'+userId+'/ordenes');
         if (!response.ok) {
           throw new Error('Error al obtener las órdenes');
         }
@@ -53,7 +55,7 @@ const OrdenesUsuario = () => {
 
   const handleCancelOrder = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3080/admin/ordenes/${id}`, {
+      const response = await fetch(url2+'/admin/ordenes/'+id, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
