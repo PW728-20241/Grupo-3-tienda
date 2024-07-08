@@ -30,11 +30,17 @@ const CartPage = () => {
     navigate('/checkout');
   };
 
-  const productoToAdd = JSON.parse(localStorage.getItem('productoToAdd'));
+  // Simulación de un producto de ejemplo
+  const productoToAdd = {
+    id: 1,
+    nombre: 'Ejemplo de Producto',
+    cantidad: 1,
+    precio: 50.00, // Precio en soles
+  };
 
   return (
     <>
-      <Header/>
+      <Header />
       <Container sx={{ py: 4 }}>
         <Typography variant="h5" sx={{ mb: 3 }}>{cartItems.length} Items en tu Carrito de Compras</Typography>
         {cartItems.length === 0 ? (
