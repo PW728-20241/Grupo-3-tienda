@@ -777,6 +777,63 @@ app.get("/admin/productos/:id/checkout", async (req, res) => {
     res.status(500).json({ error: 'Error al obtener el producto para el checkout' });
   }
 });
+////////////
+
+app.post('/orden', async (req, res) => {
+  const { shippingAddress, paymentMethod, creditCard, cartItems, total, shippingMethod, userId } = req.body;
+
+  try {
+    // Crear la orden
+    const newOrder = await Orden.create({
+      direccion: shippingAddress,
+      metodoPago: paymentMethod,
+      metodoEnvio: shippingMethod,
+      total,
+      estado: 'pendiente',
+      usuarioId: userId
+    });
+
+    // Crear las relaciones de productos en la orden y reducir el stock
+    for (const item of cartItems) {
+      await OrderProduct.create({
+        ordenId: newOrder.id,
+        productoId: item.id,
+        cantidad: item.cantidad
+      });
+
+      const producto = await Producto.findByPk(item.id);
+      if (producto) {
+        producto.stock -= item.cantidad;
+        await producto.save();
+      }
+    }
+
+    res.json(newOrder);
+  } catch (error) {
+    console.error('Error al crear la orden:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+app.get('/ordenes', async (req, res) => {
+    const usuarioId = req.query.usuarioId;
+  
+    if (!usuarioId) {
+      return res.status(400).json({ error: 'usuarioId es requerido' });
+    }
+  
+    try {
+      const ordenes = await Orden.findAll({
+        where: {
+          usuarioId: usuarioId
+        }
+      });
+  
+      res.json(ordenes);
+    } catch (error) {
+      console.error('Error al obtener las órdenes:', error);
+      res.status(500).json({ error: 'Error al obtener las órdenes' });
+    }
+  });
 
 /////////////FIN DE RUTAS////////////////
 
