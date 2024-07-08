@@ -54,7 +54,7 @@ function DetailsBox(img){
                     border: '2px solid gray',
                     ml: 8,
                     borderRadius: 2,
-                    backgroundImage: 'url(${img})',
+                    backgroundImage: `url(${producto.imagen})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}
