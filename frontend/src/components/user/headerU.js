@@ -7,22 +7,18 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
 
 function Header2() {
-  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const handlerClickMV = () => {
-    setSearchQuery("coleccion")
-    navigate("/busqueda", {state: {searchQuery}});
+    navigate("/busqueda", {state: {searchQuery: "mas vendidos"}});
   };
 
   const handlerClickO = () => {
-    setSearchQuery("oferta")
-    navigate("/busqueda", {state: {searchQuery}});
+    navigate("/busqueda", {state: {searchQuery: "oferta"}});
   };
 
   const handlerClickN = () => {
-    setSearchQuery("nuevo")
-    navigate("/busqueda", {state: {searchQuery}});
+    navigate("/busqueda", {state: {searchQuery: "nuevo"}});
   };
 
   return (
@@ -51,7 +47,6 @@ function Header2() {
         </Toolbar>
       </AppBar>
     </>
-
   )
 }
 export default Header2;

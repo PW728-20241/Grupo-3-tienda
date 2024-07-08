@@ -7,6 +7,8 @@ import { Orden } from "./models/Orden.js";
 import { Producto } from "./models/Producto.js";
 import { Orden_Producto } from "./models/Orden_Producto.js";
 import { Serie } from "./models/Serie.js";
+import { Marca } from "./models/Marca.js";
+import { Tipo } from "./models/Tipo.js";
 
 const app = express();
 const port = process.env.PORT || 3080;
@@ -413,6 +415,192 @@ app.post("/admin/productos", async function(req, res) {
       res.status(500).json({ error: 'Error al crear el producto' });
   }
 });
+/////////////MARCAS////////////////
+app.get("/admin/marcas", async function(req, res) {
+  try {
+      const marcas = await Marca.findAll({
+          include: [
+              {
+                  model: Producto,
+                  attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
+              }
+          ]
+      });
+      res.status(200).json(marcas);
+  } catch (error) {
+      console.error('Error al obtener las marcas:', error);
+      res.status(500).json({ error: 'Error al obtener las marcas' });
+  }
+});
+
+app.get("/admin/marcas/:id", async function(req, res) {
+  const idMarca = req.params.id;
+  try {
+      const marca = await Marca.findOne({
+          where: { id: idMarca },
+          include: [
+              {
+                  model: Producto,
+                  attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
+              }
+          ]
+      });
+      res.status(200).json(marca);
+  } catch (error) {
+      console.error('Error al obtener la marca:', error);
+      res.status(500).json({ error: 'Error al obtener la marca' });
+  }
+});
+
+app.post("/admin/marcas", async function(req, res) {
+  try {
+      const { nombre, descripcion, productos } = req.body;
+      const nuevaMarca = await Marca.create({ nombre, descripcion });
+      if (productos && productos.length > 0) {
+          await nuevaMarca.addProductos(productos);
+      }
+      res.status(201).json(nuevaMarca);
+  } catch (error) {
+      console.error('Error al crear la marca:', error);
+      res.status(500).json({ error: 'Error al crear la marca' });
+  }
+});
+
+app.put("/admin/marcas/:id", async function(req, res) {
+  const idMarca = req.params.id;
+  try {
+    const { nombre, descripcion, productos } = req.body;
+    const marca = await Marca.findOne({ where: { id: idMarca } });
+    await marca.update({ nombre, descripcion });
+
+    if (productos && productos.length > 0) {
+      for (const productoId of productos) {
+        const producto = await Producto.findByPk(productoId);
+        await marca.addProducto(producto);
+      }
+    }
+
+    const marcaActualizada = await Marca.findOne({
+      where: { id: idMarca },
+      include: [
+        {
+          model: Producto,
+          attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
+        }
+      ]
+    });
+
+    res.status(200).json(marcaActualizada);
+  } catch (error) {
+      console.error('Error al actualizar la marca:', error);
+      res.status(500).json({ error: 'Error al actualizar la marca' });
+  }
+});
+
+/////////////TIPO////////////////
+app.get("/admin/tipos", async function(req, res) {
+  try {
+      const tipos = await Tipo.findAll({
+          include: [
+              {
+                  model: Producto,
+                  attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
+              },
+              {
+                  model: Serie,
+                  attributes: ["id","nombre","descripcion","fechaRegistro", "NroProductos"],
+              }
+          ]
+      });
+      res.status(200).json(tipos);
+  } catch (error) {
+      console.error('Error al obtener los tipos:', error);
+      res.status(500).json({ error: 'Error al obtener los tipos' });
+  }
+});
+
+app.get("/admin/tipos/:id", async function(req, res) {
+  const idTipo = req.params.id;
+  try {
+      const tipo = await Tipo.findOne({
+          where: { id: idTipo },
+          include: [
+              {
+                  model: Producto,
+                  attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
+
+                  model: Serie,
+                  attributes: ["id","nombre","descripcion","fechaRegistro", "NroProductos"],
+              }
+          ]
+      });
+      res.status(200).json(tipo);
+  } catch (error) {
+      console.error('Error al obtener el tipo:', error);
+      res.status(500).json({ error: 'Error al obtener el tipo' });
+  }
+});
+
+app.post("/admin/tipos", async function(req, res) {
+  try {
+      const { nombre, descripcion, productos, series } = req.body;
+      const nuevoTipo = await Tipo.create({ nombre, descripcion });
+      if (productos && productos.length > 0) {
+          await nuevoTipo.addProductos(productos);
+      }
+      if (series && series.length > 0) {
+        await nuevoTipo.addSeries(series);
+    }
+      res.status(201).json(nuevoTipo);
+  } catch (error) {
+      console.error('Error al crear el tipo:', error);
+      res.status(500).json({ error: 'Error al crear el tipo' });
+  }
+});
+
+app.put("/admin/tipos/:id", async function(req, res) {
+  const idTipo = req.params.id;
+  try {
+    const { nombre, descripcion, productos, series } = req.body;
+    const tipo = await Marca.findOne({ where: { id: idTipo } });
+    await tipo.update({ nombre, descripcion });
+
+    if (productos && productos.length > 0) {
+      for (const productoId of productos) {
+        const producto = await Producto.findByPk(productoId);
+        await tipo.addProducto(producto);
+      }
+    }
+
+    if (series && series.length > 0) {
+      for (const serieId of series) {
+        const serie = await Serie.findByPk(serieId);
+        await tipo.addSerie(serie);
+      }
+    }
+
+    const tipoActualizado = await Tipo.findOne({
+      where: { id: idTipo },
+      include: [
+        {
+          model: Producto,
+          attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
+
+          model: Serie,
+          attributes: ["id", "nombre","detalle", "precio", "fechaRegistro", "stock", "estado"],
+        }
+      ]
+    });
+
+    res.status(200).json(tipoActualizado);
+  } catch (error) {
+      console.error('Error al actualizar el tipo:', error);
+      res.status(500).json({ error: 'Error al actualizar el tipo' });
+  }
+});
+
+
+
 /////////////SERIES////////////////
 app.get("/admin/series", async function(req, res) {
   try {

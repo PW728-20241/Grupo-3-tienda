@@ -32,11 +32,9 @@ const OrdenesUsuario = () => {
   if (error) {
     return (
       <>
-        <Header />
         <Container>
           <Typography variant="h6" color="error">{error}</Typography>
         </Container>
-        <Footer />
       </>
     );
   }
@@ -44,11 +42,9 @@ const OrdenesUsuario = () => {
   if (!ordenes || ordenes.length === 0) {
     return (
       <>
-        <Header />
         <Container>
           <Typography variant="h6">No hay órdenes disponibles</Typography>
         </Container>
-        <Footer />
       </>
     );
   }

@@ -9,20 +9,77 @@ import AppBar from '@mui/material/AppBar';
 import React, { useState, useEffect } from 'react';
 
 function Principal(){
-    const [objetos,setObjetos] = useState([]);
+    const [producto, setProducto] = useState([]);
+    const [serie, setSerie] = useState({});
+    const [tipo, setTipo] = useState({});
+    
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetch("http://localhost:3080/admin/productos",{
+      const fetchData = async () => {
+        try {
+          const response = await fetch("http://localhost:3080/admin/productos", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+          const data = await response.json();
+          setProducto(data);
+    
+          const seriesPromises = data.map(async (producto) => {
+            try {
+              const serieResponse = await fetch(`http://localhost:3080/admin/series/${producto.id}`, {
                 method: "GET",
                 headers: {
-                    "Content-Type": "application/json"
+                  "Content-Type": "application/json"
                 }
-            });
-            const data = await response.json();
-            setObjetos(data);
-        };
-        fetchData();
-      }, []);
+              });
+              const serieData = await serieResponse.json();
+              if (serieData && serieData.nombre) {
+                return { [producto.id]: serieData.nombre };
+              } else {
+                return { [producto.id]: null }; // or some default value
+              }
+            } catch (error) {
+              console.error(`Error fetching serie for product ${producto.id}:`, error);
+              return { [producto.id]: null }; // or some default value
+            }
+          });
+    
+          const tiposPromises = data.map(async (producto) => {
+            try {
+              const tipoResponse = await fetch(`http://localhost:3080/admin/tipos/${producto.id}`, {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json"
+                }
+              });
+              const tipoData = await tipoResponse.json();
+              if (tipoData && tipoData.nombre) {
+                return { [producto.id]: tipoData.nombre };
+              } else {
+                return { [producto.id]: null }; // or some default value
+              }
+            } catch (error) {
+              console.error(`Error fetching tipo for product ${producto.id}:`, error);
+              return { [producto.id]: null }; // or some default value
+            }
+          });
+    
+          const seriesData = await Promise.all(seriesPromises);
+          const seriesObject = Object.assign({},...seriesData);
+          setSerie(seriesObject);
+    
+          const tiposData = await Promise.all(tiposPromises);
+          const tiposObject = Object.assign({},...tiposData);
+          setTipo(tiposObject);
+    
+        } catch (error) {
+          console.error("Error fetching productos:", error);
+        }
+      };
+      fetchData();
+    }, []);
+
     return(
        <>   
             <Header2/>
@@ -39,19 +96,17 @@ function Principal(){
                 justifyContent="space-between"
                 alignItems="center"
                 >
-                    {/*
-                        {objetos.filter(objetos => objetos.tipo === "coleccion").map(objetos => (
+                    {producto.filter(producto => serie[producto.id] && producto !== tipo[producto.id]).slice(0,3).map(producto => (
                         <SCollection
-                            id={objetos.id}
-                            txtL1={objetos.nombre}
+                            key={`lista1-${producto.id}`}
+                            id={producto.id}
+                            txtL1={serie[producto.id]}
                             hiperv="Learn More"
-                            src={objetos.imagen}
+                            src={producto.imagen}
                             width='25vw'
                             height='50vh'
                         />
-                    ))}
-                    */}
-                    
+                    ))};
                 </Stack>
             </Box>
 
@@ -68,11 +123,11 @@ function Principal(){
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    {objetos.filter(objetos => objetos.id>0 && objetos.id<4).map(objetos => (
+                    {producto.filter(producto => !serie[producto.id] && tipo[producto.id] != "nuevo").slice(0,5).map(producto => (
                         <SCollection
-                        txtL1={objetos.nombre}
+                        txtL1={producto.nombre}
                         hiperv="Learn More"
-                        src={objetos.imagen}
+                        src={producto.imagen}
                         width='12vw'
                         height='30vh'
                         />
@@ -92,11 +147,11 @@ function Principal(){
                  justifyContent="space-between"
                  alignItems="center"
              >
-                 {objetos.filter(objetos => objetos.id>8 && objetos.id<14).map(objetos => (
+                 {producto.filter(producto => !serie[producto.id] && tipo[producto.id] != "nuevo").slice(5,10).map(producto => (
                     <SCollection
-                        txtL1={objetos.nombre}
+                        txtL1={producto.nombre}
                         hiperv="Learn More"
-                        src={objetos.imagen}
+                        src={producto.imagen}
                         width='12vw'
                         height='30vh'
                     />
@@ -127,11 +182,11 @@ function Principal(){
                     direction="row"
                     justifyContent="space-between"
                 >
-                    {objetos.filter(objetos => objetos.id === 14).map(objetos => (
+                    {producto.filter(producto => tipo[producto.id] === "nuevo" && serie[producto.id]).slice(14,14).map(producto => (
                         <SCollection
-                            txtL1={objetos.nombre}
+                            txtL1={serie[producto.id]}
                             hiperv="Learn More"
-                            src={objetos.imagen}
+                            src={producto.imagen}
                             width='50vw'
                             height='60vh'
                         />
@@ -142,11 +197,11 @@ function Principal(){
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    {objetos.filter(objetos => objetos.id>14 && objetos.id<17).map(objetos => (
+                    {producto.filter(producto => tipo[producto.id] === "nuevo" && serie[producto.id]).slice(15,17).map(producto => (
                         <SCollection
-                            txtL1={objetos.nombre}
+                            txtL1={producto.nombre}
                             hiperv="Learn More"
-                            src={objetos.imagen}
+                            src={producto.imagen}
                             width='40vw'
                             height='30vh'
                         />
@@ -167,11 +222,11 @@ function Principal(){
                  justifyContent="space-between"
                  alignItems="center"
                 >
-                 {objetos.filter(objetos => objetos.id>16).map(objetos => (
+                 {producto.filter(producto => tipo[producto.id] === "nuevo" && !serie[producto.id]).slice(18,22).map(producto => (
                     <SCollection
-                        txtL1={objetos.nombre}
+                        txtL1={producto.nombre}
                         hiperv="Learn More"
-                        src={objetos.imagen}
+                        src={producto.imagen}
                         width='12vw'
                         height='30vh'
                     />

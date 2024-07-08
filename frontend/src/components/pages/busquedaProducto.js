@@ -11,30 +11,110 @@ import Footer from '../common/footer';
 import { useLocation } from "react-router-dom";
 function Busqueda(){
     const location = useLocation();
-    
     const searchQuery = location.state.searchQuery;
 
     const [selectedValue, setSelectedValue] = useState(1);
-
     const handleChange = (event) => {
         setSelectedValue(event.target.value);
     };
 
-    const [productos,setProductos] = useState([]);
+    const [producto, setProducto] = useState([]);
+    const [serie, setSerie] = useState({});
+    const [tipo, setTipo] = useState({});
+    const [marca,setMarca] = useState([]);
+    
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch("http://localhost:3080/admin/productos",{
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
+          try {
+            const response = await fetch("http://localhost:3080/admin/productos", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json"
+              }
             });
             const data = await response.json();
-            setProductos(data);
-            console.log(searchQuery);
+            setProducto(data);
+      
+            const seriesPromises = data.map(async (producto) => {
+              try {
+                const serieResponse = await fetch(`http://localhost:3080/admin/series/${producto.id}`, {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json"
+                  }
+                });
+                const serieData = await serieResponse.json();
+                if (serieData && serieData.nombre) {
+                  return { [producto.id]: serieData.nombre };
+                } else {
+                  return { [producto.id]: null }; // or some default value
+                }
+              } catch (error) {
+                console.error(`Error fetching serie for product ${producto.id}:`, error);
+                return { [producto.id]: null }; // or some default value
+              }
+            });
+      
+            const tiposPromises = data.map(async (producto) => {
+              try {
+                const tipoResponse = await fetch(`http://localhost:3080/admin/tipos/${producto.id}`, {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json"
+                  }
+                });
+                const tipoData = await tipoResponse.json();
+                if (tipoData && tipoData.nombre) {
+                  return { [producto.id]: tipoData.nombre };
+                } else {
+                  return { [producto.id]: null }; // or some default value
+                }
+              } catch (error) {
+                console.error(`Error fetching tipo for product ${producto.id}:`, error);
+                return { [producto.id]: null }; // or some default value
+              }
+            });
+      
+            const marcasPromises = data.map(async (producto) => {
+              try {
+                const marcaResponse = await fetch(`http://localhost:3080/admin/marcas/${producto.id}`, {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json"
+                  }
+                });
+                const marcaData = await marcaResponse.json();
+                if (marcaData && marcaData.nombre) {
+                  return { [producto.id]: marcaData.nombre };
+                } else {
+                  return { [producto.id]: null }; // or some default value
+                }
+              } catch (error) {
+                console.error(`Error fetching marca for product ${producto.id}:`, error);
+                return { [producto.id]: null }; // or some default value
+              }
+            });
+      
+            const seriesData = await Promise.all(seriesPromises);
+            const seriesObject = Object.assign({},...seriesData);
+            setSerie(seriesObject);
+      
+            const tiposData = await Promise.all(tiposPromises);
+            const tiposObject = Object.assign({},...tiposData);
+            setTipo(tiposObject);
+      
+            const marcasData = await Promise.all(marcasPromises);
+            const marcasObject = Object.assign({},...marcasData);
+            setMarca(marcasObject);
+      
+          } catch (error) {
+            console.error("Error fetching productos:", error);
+          }
         };
         fetchData();
       }, []);
+
+            
       
     return(
         <>
@@ -85,13 +165,14 @@ function Busqueda(){
                     mt : 2
                 }}
             >
-                {productos.filter(productos => productos.nombre === searchQuery || productos.serie === searchQuery || productos.marca === searchQuery || productos.tipo === searchQuery).map(productos => (
+                {producto.filter(producto => producto.nombre === searchQuery || serie[producto.id] === searchQuery || marca[producto.id] === searchQuery || tipo[producto.id] === searchQuery || searchQuery === "" ).map(producto => (
                     <ListaItemCarr
-                        imagen = {productos.imagen}
-                        nombre = {productos.nombre}
-                        serie = {productos.serie}
-                        fabricante= {productos.marca}
-                        precio = {productos.precio}
+                        key={`lista1-${producto.id}`}
+                        imagen = {producto.imagen}
+                        nombre = {producto.nombre}
+                        serie = {serie[producto.id]}
+                        fabricante= {marca[producto.id]}
+                        precio = {producto.precio}
                     />
                 ))};
             </Box>

@@ -14,30 +14,62 @@ import { useLocation} from 'react-router-dom';
 function Details(){
     const location = useLocation();
     const id = location.state.id;
-    const [producto,setProducto] = useState([]);
     
-    useEffect(() => {
+    const [selectedValue, setSelectedValue] = useState(1);
+    const [serie,setSerie] = useState([]);
+    const [marca,setMarca] = useState([]);
+    const [tipo,setTipo] = useState([]);
+    const [producto,setProducto] = useState([]);
+    const [serieDescripcion, setSerieDescripcion] = useState([]);
+    const handleChange = (event) => {
+        setSelectedValue(event.target.value);
+      };
+      
+      useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch("http://localhost:3080/admin/productos/"+ id,{
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
+          try {
+            const response = await fetch(`http://localhost:3080/admin/productos/${id}`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json"
+              }
             });
             const data = await response.json();
             setProducto(data);
-            console.log(id);
-            
+      
+            const serieResponse = await fetch(`http://localhost:3080/admin/series/${id}`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json"
+              }
+            });
+            const serieData = await serieResponse.json();
+            setSerie(serieData.nombre);
+            setSerieDescripcion(serieData.descripcion);
+
+            const marcaResponse = await fetch(`http://localhost:3080/admin/marcas/${id}`, {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json"
+                }
+              });
+              const marcaData = await marcaResponse.json();
+              setMarca(marcaData.nombre);
+      
+          } catch (error) {
+            console.error("Error fetching marcas:", error);
+          }
         };
         fetchData();
       }, [id]);
+
     return(
         <>
             <Header2/>
-            <Typography sx={{fontSize : '2rem', px : 8}}>Titulo del Producto: {producto.nombre}</Typography>
+                <Typography sx={{fontSize : '2rem', px : 8}}>Titulo del Producto: {producto.nombre}</Typography>
 
             <br/>
-            <Typography sx={{fontSize : '1.5rem', px : 8}}>Por: {producto.marca} -Serie: {producto.serie}</Typography>
+            <Typography sx={{fontSize : '1.5rem', px : 8}}>Por: {marca} -Serie: {serie}</Typography>
 
             <AppBar position="static"
                 sx = {{
@@ -53,7 +85,7 @@ function Details(){
 
             <Typography variant="body1" component="p" fontWeight="bold" px={8} pt={2}>Descripcion:</Typography>
             <Typography variant="body1" component="p" px={8} pt={2}>
-                Descripcion del producto
+                {serieDescripcion}
             </Typography>
             <Box
                 sx={{
